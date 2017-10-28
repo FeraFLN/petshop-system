@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.CargoDao">
+ 
+    <resultMap id="cargo" type="Cargo">
+        <id property="idCargo" column="id_cargo"/>
+        <result property="descricao" column="descricao"/>
+        <result property="dataexclusao" column="Data_exclusao"/>
+        <result property="versao" column="versao"/>
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="Cargo" resultMap="cargo">
+        SELECT * 
+          FROM cargo 
+          where upper(descricao) like upper('%'||coalesce(#{descricao},'')||'%') 
+           and coalesce(data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+          order by descricao 
+    </select>
+    
+    <update  id="update" parameterType="Cargo">
+        update cargo
+           set descricao = #{descricao}
+         where id_cargo = #{idCargo}  
+    </update>
+    <delete  id="delete" parameterType="Cargo">
+        delete 
+          from cargo
+         where id_cargo = #{idCargo}  
+    </delete>
+    <insert  id="insert" parameterType="Cargo">
+        insert into 
+         cargo (descricao) 
+        values (#{descricao})  
+    </insert>
+    
+ 
+</mapper>

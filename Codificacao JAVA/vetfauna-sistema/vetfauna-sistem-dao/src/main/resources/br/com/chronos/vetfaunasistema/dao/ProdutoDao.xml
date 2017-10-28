@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.ProdutoDao">
+ 
+    <resultMap id="produto" type="produto">
+        <id property="idProduto" column="id_produto"/>
+        <result property="unidadeMedida.idUnidadeMedida" column="id_unidade_Medida"/>
+        <result property="unidadeMedida.abreviacao" column="abreviacao"/>
+        <result property="unidadeMedida.descricao" column="descricao_unidade"/>
+        <result property="marcaProduto.categoriaProduto.idCategoriaProduto" column="id_categoria_produto"/>
+        <result property="marcaProduto.categoriaProduto.descricao" column="descricao_categoria"/>
+        <result property="marcaProduto.idMarcaProduto" column="id_marca_produto"/>
+        <result property="marcaProduto.descricao" column="descricao_marca"/>
+        <result property="codigoBarra" column="codigo_barra"/>
+        <result property="nome" column="nome"/>
+        <result property="valorMedida" column="valor_medida"/>
+        <result property="preco" column="preco"/>
+        <result property="quantidadeMinima" column="quantidade_minima"/>
+        <result property="antecedenciaVencimento" column="antecedencia_vencimento"/>
+        <result property="totalEstoque" column="total_estoque"/>
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="produto" resultMap="produto">
+        SELECT   p.id_produto,
+         p.id_unidade_Medida, 
+         um.abreviacao,
+         cp.id_categoria_produto,
+         cp.descricao descricao_categoria,
+         p.id_marca_produto,
+         mp.descricao descricao_marca,
+         um.descricao descricao_unidade,
+         p.nome,
+         p.codigo_barra,
+         p.valor_medida, 
+         p.preco,
+         p.quantidade_minima,
+         p.antecedencia_vencimento,
+         coalesce((select sum(e2.quantidade)
+                     from estoque e2
+                    where e2.id_produto = p.id_produto),0) total_estoque
+          from  produto p ,
+                categoria_produto cp,
+                marca_produto mp,
+                unidade_medida um
+          where p.id_unidade_Medida = um.id_unidade_Medida
+            AND mp.id_CATEGORIA_produto = cp.id_categoria_produto
+            AND p.id_marca_produto = mp.id_marca_produto
+            <!--if test="categoriaProduto != null and categoriaProduto.idCategoriaProduto != 0">
+                and p.id_categoria_Produto = #{categoriaProduto.idCategoriaProduto}
+            </if-->
+            <if test="idProduto != null and idProduto != 0">
+                and p.id_Produto = #{idProduto}
+            </if>
+            <if test="marcaProduto != null and marcaProduto.idMarcaProduto != 0">
+                and p.id_marca_Produto = #{marcaProduto.idMarcaProduto}
+            </if>
+            and upper(p.nome) like upper('%'||coalesce(#{nome},'')||'%') 
+            and coalesce(p.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+          order by descricao_categoria, descricao_marca,p.nome
+    </select>
+    
+    <select id="selectId" resultType="Integer">
+        SELECT nextval('id_produto')
+    </select>
+    
+    
+    <update  id="update" parameterType="produto">
+        update produto
+           set id_unidade_Medida = #{unidadeMedida.idUnidadeMedida},
+               nome = #{nome},
+               id_marca_produto=#{marcaProduto.idMarcaProduto},
+               codigo_barra=#{codigoBarra},
+               valor_medida =#{valorMedida}, 
+               preco=#{preco},
+               quantidade_minima=#{quantidadeMinima},
+               antecedencia_vencimento=#{antecedenciaVencimento}
+         where id_produto = #{idProduto}  
+    </update>
+   
+    
+    <delete  id="delete" parameterType="produto">
+        delete 
+          from produto
+         where id_produto = #{idProduto}  
+    </delete>
+    
+    <insert  id="insert" parameterType="produto">
+        INSERT INTO produto (id_produto,
+                         id_unidade_Medida, 
+                         nome,
+                         id_marca_produto,
+                         codigo_barra,
+                         valor_medida, 
+                         preco,
+                         quantidade_minima,
+                         antecedencia_vencimento
+                        ) 
+                VALUES ( #{idProduto},
+                         #{unidadeMedida.idUnidadeMedida},
+                         #{nome},
+                         #{marcaProduto.idMarcaProduto},
+                         #{codigoBarra},
+                         #{valorMedida}, 
+                         #{preco},
+                         #{quantidadeMinima},
+                         #{antecedenciaVencimento})
+    </insert>
+    
+ 
+</mapper>

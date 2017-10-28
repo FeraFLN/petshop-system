@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.ClienteDao">
+ 
+    <resultMap id="cliente" type="cliente">
+        <id property="idCliente" column="id_cliente"/>
+        <result property="endereco.idEndereco" column="id_Endereco"/>
+        <result property="endereco.tipoLogradouro.idTipoLogradouro" column="id_tipo_Logradouro"/>
+        <result property="endereco.tipoLogradouro.descricao" column="desc_Logradouro"/>
+        <result property="endereco.cep" column="cep"/>
+        <result property="endereco.bairro" column="bairro"/>
+        <result property="endereco.logradouro" column="logradouro"/>
+        <result property="endereco.numero" column="numero"/>
+        <result property="endereco.complemento" column="complemento"/>
+        <result property="endereco.municipio.idMunicipio" column="id_municipio"/>
+        
+        <result property="nome" column="nome"/>
+        <result property="email" column="email"/>
+        <collection property="telefoneContato" column="id_cliente" javaType="ArrayList" ofType="TelefoneContato">
+            <id property="idTelefoneContato" column="id_telefone_contato"/>
+            <result property="ddd" column="ddd"/>
+            <result property="numero" column="numero_telefone"/>
+            <result property="tipoTelefoneContato.idTipoTelefoneContato" column="id_tipo_Telefone_Contato"/>
+            <result property="tipoTelefoneContato.descricao" column="descricao_telefone"/>
+        </collection> 
+        
+        <collection property="pessoaAutorizadas" column="id_cliente" javaType="ArrayList" ofType="PessoasAutorizadas">
+            <id property="idPessoasAutorizadas" column="id_pessoas_autorizadas"/>
+            <result property="nome" column="nome_pessoa_autorizada"/>
+            <result property="observacao" column="observacao_pessoa_autorizada"/>
+        </collection> 
+        
+        <collection property="animals" column="id_cliente" javaType="ArrayList" ofType="Animal">
+            <id property="idAnimal" column="id_animal"/>
+            <result property="nome" column="nome_animal"/>
+            <result property="dataNascimento" column="data_nascimento"/>
+            <result property="raca.idRaca" column="id_raca"/>
+            <result property="raca.descricao" column="descricao_raca"/>
+            <result property="raca.especie.idEspecie" column="id_especie"/>
+            <result property="raca.especie.descricao" column="descricao_epsecie"/>
+            <result property="sexo" column="sexo"/>
+            <result property="observacao" column="observacao"/>
+        </collection> 
+       
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="cliente" resultMap="cliente">
+        select c.id_cliente,
+               c.nome,
+               c.email,
+               en.id_tipo_Logradouro,
+               en.cep,
+               tl.descricao,
+               en.id_endereco,
+               en.id_municipio,
+               en.logradouro,
+               en.bairro,
+               en.numero,
+               en.complemento,
+               p.id_pessoas_autorizadas,
+               p.nome nome_pessoa_autorizada,
+               p.observacao observacao_pessoa_autorizada,
+               a.id_animal,
+               a.nome nome_animal,
+               (CASE WHEN a.sexo = 'Macho' then 'M' when a.sexo is not null then 'F' else null end)  sexo,
+               a.observacao,
+              a.data_nascimento,
+               e.id_especie,
+               e.descricao descricao_especie,
+               r.id_raca,
+               r.descricao descricao_raca,
+               tc.id_telefone_contato,
+               tc.ddd,
+               tc.numero numero_telefone,
+               ttc.id_tipo_Telefone_Contato,
+               ttc.descricao descricao_telefone
+
+        from cliente c     
+        left JOIN pessoas_autorizadas p
+               on (p.id_cliente = c.id_cliente and coalesce(p.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE)
+        left JOIN animal a
+               on (a.id_cliente = c.id_cliente and coalesce(a.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE)
+        left JOIN raca r
+               on a.id_raca = r.id_raca
+        left JOIN especie e
+               on r.id_especie = e.id_especie
+        left JOIN endereco en
+               on en.id_endereco =c.id_endereco
+        left JOIN tipo_logradouro tl
+               on tl.id_tipo_logradouro=en.id_tipo_logradouro
+        left JOIN telefone_cliente tcl
+               on c.id_cliente = tcl.id_cliente
+        left join telefone_contato tc 
+               on (tc.id_telefone_contato = tcl.id_telefone_contato)
+        left join tipo_telefone_contato ttc 
+               on (tc.id_tipo_telefone_contato = ttc.id_tipo_telefone_contato)
+        where coalesce(c.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+           <if test="nome != null and !nome.empty">
+               and upper(c.nome) like upper('%'||coalesce(#{nome},'')||'%') 
+           </if>
+           <if test="nomePessoasAutorizadas != null and !nomePessoasAutorizadas.empty">
+               and upper(p.nome) like upper('%'||coalesce(#{nomePessoasAutorizadas},'')||'%') 
+           </if>
+           <if test="nomeAnimal != null and !nomeAnimal.empty">
+               and upper(a.nome) like upper('%'||coalesce(#{nomeAnimal},'')||'%') 
+           </if>
+                  order by c.nome,a.nome
+    </select>
+    
+   
+    
+    <update  id="update" parameterType="cliente">
+        update cliente
+           set id_Endereco = #{endereco.idEndereco},
+               nome = #{nome},
+               email =#{email}
+         where id_cliente = #{idCliente}  
+    </update>
+   
+   
+    <delete  id="delete" parameterType="cliente">
+        delete 
+          from cliente
+         where id_cliente = #{idCliente}  
+    </delete>
+     <select id="selectIdDomain" resultType="int">
+        SELECT nextval('id_cliente')
+    </select>
+    <insert  id="insert" parameterType="cliente">
+       insert into cliente (id_cliente,
+                            nome,
+                            email,
+                            id_Endereco) 
+                     values(#{idCliente},
+                            #{nome},
+                            #{email}, 
+                            #{endereco.idEndereco})
+    </insert>
+ 
+</mapper>

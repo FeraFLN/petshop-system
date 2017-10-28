@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.VacinaDao">
+ 
+    <resultMap id="vacina" type="Vacina">
+        <id property="idVacina" column="id_vacina"/>
+        <result property="descricao" column="descricao"/>
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="Vacina" resultMap="vacina">
+        SELECT * 
+          FROM vacina 
+          where upper(descricao) like upper('%'||coalesce(#{descricao},'')||'%') 
+          order by descricao 
+    </select>
+    
+    <update  id="update" parameterType="Vacina">
+        update vacina
+           set descricao = #{descricao}
+         where id_vacina = #{idVacina}  
+    </update>
+    <delete  id="delete" parameterType="Vacina">
+        delete 
+          from vacina
+         where id_vacina = #{idVacina}  
+    </delete>
+    <insert  id="insert" parameterType="Vacina">
+        insert into 
+         vacina (descricao) 
+        values (#{descricao})  
+    </insert>
+    
+ 
+</mapper>

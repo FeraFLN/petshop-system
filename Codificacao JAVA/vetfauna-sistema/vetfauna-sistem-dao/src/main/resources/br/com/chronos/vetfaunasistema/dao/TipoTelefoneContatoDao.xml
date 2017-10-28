@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.TipoTelefoneContatoDao">
+ 
+     <resultMap id="tipoTelefoneContato" type="tipoTelefoneContato">
+        <id property="idTipoTelefoneContato" column="id_Tipo_Telefone_Contato"/>
+        <result property="descricao" column="descricao"/>
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="tipoTelefoneContato" resultMap="tipoTelefoneContato">
+        SELECT id_tipo_telefone_contato,
+               descricao
+          FROM tipo_telefone_contato
+      order by descricao 
+    </select>
+ 
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.TelefoneContatoDao">
+ 
+   <!--INICIO TELEFONE CONTATO -->
+    <select id="selectIdContato" resultType="int">
+        SELECT nextval('id_telefone_contato')
+    </select>
+    
+    <delete  id="deleteContato" parameterType="telefoneContato">
+        delete 
+          from telefone_Contato
+         where id_telefone_Contato = #{idTelefoneContato}  
+    </delete>
+    
+    <insert  id="insertContato" parameterType="telefoneContato">
+        insert into telefone_contato( id_telefone_contato,
+                                      id_tipo_telefone_contato,
+                                      ddd,
+                                      numero)
+                              values(#{idTelefoneContato},
+                                     #{tipoTelefoneContato.idTipoTelefoneContato},
+                                     #{ddd},
+                                     #{numero})  
+          
+    </insert>
+   <!--FIM TELEFONE CONTATO -->
+    
+   <!--INICIO CONTATO FUNCIONARIO -->
+    
+    <delete  id="deleteContatoFuncionario" parameterType="telefoneContato">
+        delete 
+          from telefone_funcionario
+         where id_telefone_Contato = #{idTelefoneContato}  
+    </delete>
+    
+    <insert  id="insertContatoFuncionario" parameterType="telefoneContato">
+        insert into telefone_funcionario (id_funcionario, id_telefone_contato) 
+	VALUES (#{genericDomainWithContact.idGenericDomain},#{idTelefoneContato})  
+    </insert>
+   <!--FIM CONTATO FUNCIONARIO -->
+    
+   <!--INICIO CONTATO FORNECEDOR -->
+    <delete  id="deleteContatoFornecedor" parameterType="telefoneContato">
+        delete 
+          from telefone_fornecedor
+         where id_telefone_Contato = #{idTelefoneContato}  
+    </delete>
+    
+    
+    
+    <insert  id="insertContatoFornecedor" parameterType="telefoneContato">
+        insert into telefone_Fornecedor (id_Fornecedor, id_telefone_contato) 
+	VALUES (#{genericDomainWithContact.idGenericDomain},#{idTelefoneContato})  
+    </insert>
+   <!--FIM CONTATO FORNECEDOR -->
+  
+  <!--INICIO CONTATO VENDEDOR -->
+    <delete  id="deleteContatoVendedor" parameterType="telefoneContato">
+        delete 
+          from telefone_vendedor
+         where id_telefone_Contato = #{idTelefoneContato}  
+    </delete>
+    
+    
+    
+    <insert  id="insertContatoVendedor" parameterType="telefoneContato">
+        insert into telefone_vendedor (id_vendedor, id_telefone_contato) 
+	VALUES (#{genericDomainWithContact.idGenericDomain},#{idTelefoneContato})  
+    </insert>
+   <!--FIM CONTATO VENDEDOR -->
+   
+   <!--INICIO CONTATO CLIENTE -->
+    <delete  id="deleteContatoCliente" parameterType="telefoneContato">
+        delete 
+          from telefone_cliente
+         where id_telefone_Contato = #{idTelefoneContato}  
+    </delete>
+    
+    
+    
+    <insert  id="insertContatoCliente" parameterType="telefoneContato">
+        insert into telefone_cliente (id_cliente, id_telefone_contato) 
+	VALUES (#{genericDomainWithContact.idGenericDomain},#{idTelefoneContato})  
+    </insert>
+   <!--FIM CONTATO CLIENTE -->
+ 
+</mapper>

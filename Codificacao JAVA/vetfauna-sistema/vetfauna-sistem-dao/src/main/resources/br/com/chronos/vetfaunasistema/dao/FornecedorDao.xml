@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.FornecedorDao">
+ 
+    <resultMap id="fornecedor" type="fornecedor">
+        <id property="idFornecedor" column="id_fornecedor"/>
+        <result property="nome" column="nome"/>
+        <collection property="telefoneContato" column="id_fornecedor" javaType="ArrayList" ofType="TelefoneContato">
+            <id property="idTelefoneContato" column="id_telefone_contato"/>
+            <result property="ddd" column="ddd"/>
+            <result property="numero" column="numero"/>
+            <result property="tipoTelefoneContato.idTipoTelefoneContato" column="id_tipo_Telefone_Contato"/>
+            <result property="tipoTelefoneContato.descricao" column="tipo_telefone"/>
+        </collection> 
+       
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="fornecedor" resultMap="fornecedor">
+        SELECT   f.id_fornecedor,
+                 f.nome,
+                 tc.id_telefone_contato,
+                 tc.ddd,
+                 tc.numero,
+                 tc.id_tipo_Telefone_Contato,
+                 ttc.descricao as tipo_telefone
+          from  fornecedor f 
+        left JOIN telefone_fornecedor tf  
+               on f.id_fornecedor = tf.id_fornecedor
+        left join telefone_contato tc 
+               on (tc.id_telefone_contato = tf.id_telefone_contato)
+        left join tipo_telefone_contato ttc 
+               on (tc.id_tipo_telefone_contato = ttc.id_tipo_telefone_contato)
+          where upper(f.nome) like upper('%'||coalesce(#{nome},'')||'%') 
+           and coalesce(f.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+          order by f.nome 
+    </select>
+    
+    <select id="selectIdDomain" resultType="int">
+        SELECT nextval('id_fornecedor')
+    </select>
+    
+    
+    <update  id="update" parameterType="fornecedor">
+        update fornecedor
+           set nome = #{nome}
+         where id_fornecedor = #{idFornecedor}  
+    </update>
+   
+    
+    <delete  id="delete" parameterType="fornecedor">
+        delete 
+          from fornecedor
+         where id_fornecedor = #{idFornecedor}  
+    </delete>
+    
+    <insert  id="insert" parameterType="fornecedor">
+        INSERT INTO fornecedor (id_fornecedor,
+                                nome) 
+                        VALUES ( #{idFornecedor},
+                                 #{nome})
+    </insert>
+ 
+</mapper>

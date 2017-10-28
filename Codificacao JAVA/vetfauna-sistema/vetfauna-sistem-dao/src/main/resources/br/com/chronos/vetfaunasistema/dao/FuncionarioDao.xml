@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.FuncionarioDao">
+ 
+    <resultMap id="funcionario" type="funcionario">
+        <id property="idFuncionario" column="id_funcionario"/>
+        <result property="cargo.idCargo" column="id_Cargo"/>
+        <result property="cargo.descricao" column="descricao"/>
+        <result property="nome" column="nome"/>
+        <result property="pis" column="pis"/>
+        <result property="carteiraTrabalho" column="Carteira_trabalho"/>
+        <result property="rg" column="rg"/>
+        <result property="cpf" column="cpf"/>
+        <result property="salario" column="salario"/>
+        <result property="dataContratacao" column="data_contratacao"/>
+        <result property="dataNascimento" column="data_nascimento"/>
+        <result property="diaPagamento" column="dia_pagamento"/>
+        <collection property="telefoneContato" column="id_funcionario" javaType="ArrayList" ofType="TelefoneContato">
+            <id property="idTelefoneContato" column="id_telefone_contato"/>
+            <result property="ddd" column="ddd"/>
+            <result property="numero" column="numero"/>
+            <result property="tipoTelefoneContato.idTipoTelefoneContato" column="id_tipo_Telefone_Contato"/>
+            <result property="tipoTelefoneContato.descricao" column="tipo_telefone"/>
+        </collection> 
+       
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="funcionario" resultMap="funcionario">
+        SELECT   f.id_funcionario,
+                 f.id_cargo, 
+                 f.nome,
+                 f.pis,
+                 f.carteira_trabalho, 
+                 f.rg,
+                 f.cpf,
+                 f.salario,
+                 f.data_contratacao,
+                 f.data_nascimento,
+                 f.dia_pagamento,
+                 c.descricao,
+                 tc.id_telefone_contato,
+                 tc.ddd,
+                 tc.numero,
+                 tc.id_tipo_Telefone_Contato,
+                 ttc.descricao as tipo_telefone
+          from  funcionario f 
+        left JOIN telefone_funcionario tf  
+               on f.id_funcionario = tf.id_funcionario
+        left join telefone_contato tc 
+               on (tc.id_telefone_contato = tf.id_telefone_contato)
+        left join tipo_telefone_contato ttc 
+               on (tc.id_tipo_telefone_contato = ttc.id_tipo_telefone_contato),
+               cargo c
+               
+          where f.id_cargo = c.id_cargo
+            and upper(f.nome) like upper('%'||coalesce(#{nome},'')||'%') 
+           and coalesce(f.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+          order by f.nome 
+    </select>
+    
+    <select id="selectIdDomain" resultType="int">
+        SELECT nextval('id_funcionario')
+    </select>
+    
+    
+    <update  id="update" parameterType="funcionario">
+        update funcionario
+           set id_Cargo = #{cargo.idCargo},
+               nome = #{nome},
+               pis =#{pis},
+               carteira_Trabalho=#{carteiraTrabalho},
+               rg=#{rg},
+               cpf=#{cpf},
+               salario=#{salario},
+               data_Contratacao=#{dataContratacao},
+               data_nascimento=#{dataNascimento},
+               dia_pagamento=#{diaPagamento}
+         where id_funcionario = #{idFuncionario}  
+    </update>
+   
+    
+    <delete  id="delete" parameterType="funcionario">
+        delete 
+          from funcionario
+         where id_funcionario = #{idFuncionario}  
+    </delete>
+    
+    <insert  id="insert" parameterType="funcionario">
+        INSERT INTO funcionario (id_funcionario,
+                         id_cargo, 
+                         nome,
+                         pis,
+                         carteira_trabalho, 
+                         rg,
+                         cpf,
+                         salario,
+                         data_contratacao,
+                         data_nascimento,
+                         dia_pagamento
+                        ) 
+                VALUES ( #{idFuncionario},
+                         #{cargo.idCargo},
+                         #{nome},
+                         #{pis},
+                         #{carteiraTrabalho}, 
+                         #{rg},
+                         #{cpf},
+                         #{salario},
+                         #{dataContratacao},
+                         #{dataNascimento},
+                         #{diaPagamento})
+    </insert>
+    
+ 
+</mapper>

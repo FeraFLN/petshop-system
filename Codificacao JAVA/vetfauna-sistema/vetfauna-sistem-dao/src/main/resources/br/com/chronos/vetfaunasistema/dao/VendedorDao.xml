@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.VendedorDao">
+ 
+    <resultMap id="vendedor" type="vendedor">
+        <id property="idVendedor" column="id_vendedor"/>
+        <result property="nome" column="nome"/>
+        <result property="fornecedor.idFornecedor" column="id_Fornecedor"/>
+        <result property="fornecedor.nome" column="nome_fornecedor"/>
+        
+        <collection property="telefoneContato" column="id_vendedor" javaType="ArrayList" ofType="TelefoneContato">
+            <id property="idTelefoneContato" column="id_telefone_contato"/>
+            <result property="ddd" column="ddd"/>
+            <result property="numero" column="numero"/>
+            <result property="tipoTelefoneContato.idTipoTelefoneContato" column="id_tipo_Telefone_Contato"/>
+            <result property="tipoTelefoneContato.descricao" column="tipo_telefone"/>
+        </collection> 
+       
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="vendedor" resultMap="vendedor">
+        SELECT   v.id_vendedor,
+                 v.id_fornecedor, 
+                 v.nome,
+                 c.nome as nome_fornecedor,
+                 c.id_fornecedor,
+                 tc.id_telefone_contato,
+                 tc.ddd,
+                 tc.numero,
+                 tc.id_tipo_Telefone_Contato,
+                 ttc.descricao as tipo_telefone
+          from  vendedor v 
+        left JOIN telefone_vendedor tf  
+               on v.id_vendedor = tf.id_vendedor
+        left join telefone_contato tc 
+               on (tc.id_telefone_contato = tf.id_telefone_contato)
+        left join tipo_telefone_contato ttc 
+               on (tc.id_tipo_telefone_contato = ttc.id_tipo_telefone_contato),
+               fornecedor c
+               
+          where v.id_fornecedor = c.id_fornecedor
+            and upper(v.nome) like upper('%'||coalesce(#{nome},'')||'%') 
+           and coalesce(v.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+           <if test="fornecedor != null and fornecedor.idFornecedor != 0">
+                and c.id_fornecedor = #{fornecedor.idFornecedor}
+           </if>
+          order by v.nome 
+    </select>
+    
+    <select id="selectIdDomain" resultType="int">
+        SELECT nextval('id_vendedor')
+    </select>
+    
+    
+    <update  id="update" parameterType="vendedor">
+        update vendedor
+           set id_Fornecedor = #{fornecedor.idFornecedor},
+               nome = #{nome}
+         where id_vendedor = #{idVendedor}  
+    </update>
+   
+    
+    <delete  id="delete" parameterType="vendedor">
+        delete 
+          from vendedor
+         where id_vendedor = #{idVendedor}  
+    </delete>
+    
+    <insert  id="insert" parameterType="vendedor">
+        INSERT INTO vendedor (id_vendedor,
+                         id_fornecedor, 
+                         nome
+                        ) 
+                VALUES ( #{idVendedor},
+                         #{fornecedor.idFornecedor},
+                         #{nome}
+                         )
+    </insert>
+    
+ 
+</mapper>

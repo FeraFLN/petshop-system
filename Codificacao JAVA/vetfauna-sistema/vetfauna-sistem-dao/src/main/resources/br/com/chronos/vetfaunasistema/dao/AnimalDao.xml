@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.AnimalDao">
+ 
+    <resultMap id="animal" type="Animal">
+        <id property="idAnimal" column="id_animal"/>
+        <result property="nome" column="nome"/>
+        <result property="dataNascimento" column="Data_nascimento"/>
+        <result property="observacao" column="observacao"/>
+        <result property="sexo" column="sexo"/>
+        <result property="cliente.idCliente" column="id_cliente"/>
+        <result property="raca.idRaca" column="id_raca"/>
+        <result property="raca.descricao" column="descricao"/>
+        <result property="raca.especie.idEspecie" column="id_especie"/>
+        <result property="raca.especie.descricao" column="descricao_especie"/>
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="Animal" resultMap="animal">
+        SELECT a.id_animal,
+               a.nome ,
+               a.id_cliente,
+               a.id_raca,
+               (CASE WHEN a.sexo = 'Macho' then 'M' when a.sexo is not null then 'F' else null end)  sexo,
+               a.observacao,
+               a.data_nascimento,
+               r.descricao,
+               r.id_especie,
+               e.descricao descricao_especie
+          FROM animal a, raca r, especie e 
+          where upper(nome) like upper('%'||coalesce(#{nome},'')||'%') 
+           and coalesce(data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+           and a.id_raca = r.id_raca 
+           and r.id_especie = e.id_especie
+           <if test="cliente != null and cliente.idCliente != 0">
+                and id_cliente = #{cliente.idCliente}
+           </if>
+          order by nome 
+    </select>
+    <select id="selectId" resultType="int">
+        SELECT nextval('animal_id_animal_seq')
+    </select>
+    <update  id="update" parameterType="Animal">
+        update animal
+           set nome = #{nome},
+               id_cliente = #{cliente.idCliente},
+               id_raca = #{raca.idRaca},
+               observacao = #{observacao},
+               sexo = #{sexo.value},
+               data_nascimento = #{dataNascimento}
+         where id_animal = #{idAnimal}  
+    </update>
+    <delete  id="delete" parameterType="Animal">
+        delete 
+          from animal
+         where id_animal = #{idAnimal}  
+    </delete>
+    <insert  id="insert" parameterType="Animal">
+        insert into 
+         animal (id_animal,
+                nome,
+               id_cliente,
+               id_raca,
+               sexo,
+               observacao,
+               data_nascimento
+               ) 
+        values (#{idAnimal},
+                #{nome},
+                #{cliente.idCliente},
+                #{raca.idRaca},
+                #{sexo.value},
+                #{observacao},
+                #{dataNascimento}
+               )  
+    </insert>
+    
+ 
+</mapper>

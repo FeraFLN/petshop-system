@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.EspecieDao">
+ 
+    <resultMap id="especie" type="especie">
+        <id property="idEspecie" column="id_especie"/>
+        <result property="descricao" column="descricao"/>
+        
+        <collection property="racas" column="id_especie" javaType="ArrayList" ofType="Raca">
+            <id property="idRaca" column="id_raca"/>
+            <result property="descricao" column="descricao_raca"/>
+        </collection> 
+       
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="especie" resultMap="especie">
+        select e.id_especie,
+               e.descricao,
+               r.id_raca,
+               r.descricao descricao_raca
+        from especie e, raca r     
+        where upper(e.descricao) like upper('%'||coalesce(#{descricao},'')||'%') 
+          and e.id_especie = r.id_especie
+      order by e.descricao, r.descricao 
+    </select>
+    
+   
+    
+    <update  id="update" parameterType="especie">
+        update especie
+           set descricao = #{descricao},
+         where id_especie = #{idEspecie}  
+    </update>
+   
+   
+    <delete  id="delete" parameterType="especie">
+        delete 
+          from especie
+         where id_especie = #{idEspecie}  
+    </delete>
+     <select id="selectIdDomain" resultType="int">
+        SELECT nextval('id_especie')
+    </select>
+    <insert  id="insert" parameterType="especie">
+       insert into especie (descricao) 
+                     values(#{descricao})
+    </insert>
+ 
+</mapper>

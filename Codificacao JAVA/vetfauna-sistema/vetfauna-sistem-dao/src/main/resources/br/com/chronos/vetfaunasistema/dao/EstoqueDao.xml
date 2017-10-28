@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.EstoqueDao">
+ 
+    <resultMap id="estoque" type="estoque">
+        <id property="idEstoque" column="id_estoque"/>
+        <result property="produto.idProduto" column="id_produto"/>
+        <result property="produto.unidadeMedida.idUnidadeMedida" column="id_unidade_medida"/>
+        <result property="produto.unidadeMedida.abreviacao" column="abreviacao"/>
+        <result property="produto.marcaProduto.categoriaProduto.idCategoriaProduto" column="id_categoria_produto"/>
+        <result property="produto.marcaProduto.categoriaProduto.descricao" column="descricao_categoria"/>
+        <result property="produto.marcaProduto.idMarcaProduto" column="id_marca_produto"/>
+        <result property="produto.marcaProduto.descricao" column="descricao_marca"/>
+        <result property="produto.codigoBarra" column="codigo_barra"/>
+        <result property="produto.nome" column="nome"/>
+        <result property="produto.valorMedida" column="valor_medida"/>
+        <result property="produto.preco" column="preco"/>
+        <result property="produto.quantidadeMinima" column="quantidade_minima"/>
+        <result property="produto.antecedenciaVencimento" column="antecedencia_vencimento"/>
+        <result property="produto.totalEstoque" column="total_estoque"/>
+        <result property="dataValidade" column="data_validade"/>
+        <result property="quantidade" column="quantidade"/>
+        <result property="precoCompra" column="preco_compra"/>
+        <result property="percLucro" column="perc_lucro"/>
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="estoque" resultMap="estoque">
+       SELECT   e.id_estoque,
+         p.id_produto,
+         um.abreviacao,
+         um.id_unidade_medida,
+         cp.descricao descricao_categoria,
+         cp.id_categoria_produto,
+         mp.descricao descricao_marca,
+         mp.id_marca_produto,
+         
+         p.nome,
+         p.codigo_barra,
+         p.valor_medida, 
+         p.preco,
+         p.quantidade_minima,
+         p.antecedencia_vencimento,
+         e.id_estoque,
+         e.data_validade,
+         coalesce(e.quantidade,0) quantidade,
+         e.preco_compra,
+         coalesce((select sum(e2.quantidade)
+                     from estoque e2
+                    where e2.id_produto = p.id_produto),0) total_estoque,
+         round((p.preco * 100/e.preco_compra)-100,1) perc_lucro
+          from estoque e
+    right JOIN produto p
+            on p.id_produto = e.id_produto and coalesce(e.data_zerou,CURRENT_DATE+1) > CURRENT_DATE,
+                categoria_produto cp,
+                marca_produto mp,
+                unidade_medida um
+          where p.id_unidade_Medida = um.id_unidade_Medida
+            AND mp.id_CATEGORIA_produto = cp.id_categoria_produto
+            AND p.id_marca_produto = mp.id_marca_produto
+            <if test="produto !=null and produto.marcaProduto != null and produto.marcaProduto.categoriaProduto != null and produto.marcaProduto.categoriaProduto.idCategoriaProduto != null and produto.marcaProduto.categoriaProduto.idCategoriaProduto != 0">
+                and mp.id_categoria_produto = #{produto.marcaProduto.categoriaProduto.idCategoriaProduto}
+            </if>
+            <if test="produto != null and produto.idProduto != null and produto.idProduto != 0">
+                and p.id_produto = #{produto.idProduto}
+            </if>
+            <if test="produto!= null and produto.marcaProduto != null and produto.marcaProduto.idMarcaProduto != 0">
+                and p.id_marca_produto = #{produto.marcaProduto.idMarcaProduto}
+            </if>
+              and coalesce(p.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+            and upper(p.nome) like upper('%'||coalesce(#{produto.nome},'')||'%') 
+          order by  descricao_categoria, descricao_marca,p.nome
+    </select>
+    
+    <update  id="update" parameterType="estoque">
+        update estoque
+           set data_validade = #{dataValidade},
+		quantidade = #{quantidade},
+                preco_compra =#{precoCompra}
+         where id_estoque = #{idEstoque}  
+    </update>
+   
+    
+    <delete  id="delete" parameterType="estoque">
+        delete 
+          from estoque
+         where id_estoque = #{idEstoque}  
+    </delete>
+    
+    <insert  id="insert" parameterType="estoque">
+        INSERT INTO estoque (id_produto,
+                         data_validade, 
+                         quantidade,
+                         preco_compra
+                        ) 
+                VALUES ( #{produto.idProduto},
+                         #{dataValidade},
+                         #{quantidade},
+                         #{precoCompra})
+    </insert>
+    
+ 
+</mapper>

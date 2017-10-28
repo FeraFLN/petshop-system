@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.CategoriaProdutoDao">
+ 
+    <resultMap id="categoriaProduto" type="CategoriaProduto">
+        <id property="idCategoriaProduto" column="id_categoria_Produto"/>
+        <result property="descricao" column="descricao"/>
+        <collection property="marcaProdutos" column="id_categoria_Produto" javaType="ArrayList" ofType="MarcaProduto">
+            <id property="idMarcaProduto" column="id_marca_produto"/>
+            <result property="descricao" column="descricao_marca"/>
+        </collection> 
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="CategoriaProduto" resultMap="categoriaProduto">
+        SELECT cp.id_categoria_Produto, 
+              cp.descricao, 
+              mp.id_marca_produto, 
+              mp.descricao descricao_marca 
+          FROM categoria_Produto cp
+          left JOIN marca_produto mp
+               on (mp.id_categoria_Produto = cp.id_categoria_Produto)
+          where upper(cp.descricao) like upper('%'||coalesce(#{descricao},'')||'%') 
+           and coalesce(cp.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+          order by cp.descricao 
+    </select>
+    
+    <update  id="update" parameterType="CategoriaProduto">
+        update categoria_Produto
+           set descricao = #{descricao}
+         where id_categoria_Produto = #{idCategoriaProduto}  
+    </update>
+    <delete  id="delete" parameterType="CategoriaProduto">
+        delete 
+          from categoria_Produto
+         where id_categoria_Produto = #{idCategoriaProduto}  
+    </delete>
+    <insert  id="insert" parameterType="CategoriaProduto">
+        insert into 
+         categoria_Produto (descricao) 
+        values (#{descricao})  
+    </insert>
+    
+ 
+</mapper>

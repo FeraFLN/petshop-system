@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.TipoLogradouroDao">
+ 
+    <resultMap id="tipoLogradouro" type="TipoLogradouro">
+        <id property="idTipoLogradouro" column="id_tipo_Logradouro"/>
+        <result property="descricao" column="descricao"/>
+        <result property="versao" column="versao"/>
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="TipoLogradouro" resultMap="tipoLogradouro">
+        SELECT * 
+          FROM tipo_Logradouro 
+          where upper(descricao) like upper('%'||coalesce(#{descricao},'')||'%') 
+          order by descricao 
+    </select>
+    
+    <update  id="update" parameterType="TipoLogradouro">
+        update tipo_Logradouro
+           set descricao = #{descricao}
+         where id_tipo_Logradouro = #{idTipoLogradouro}  
+    </update>
+    <delete  id="delete" parameterType="TipoLogradouro">
+        delete 
+          from tipo_Logradouro
+         where id_tipo_Logradouro = #{idTipoLogradouro}  
+    </delete>
+    <insert  id="insert" parameterType="TipoLogradouro">
+        insert into 
+         tipo_Logradouro (descricao) 
+        values (#{descricao})  
+    </insert>
+    
+ 
+</mapper>

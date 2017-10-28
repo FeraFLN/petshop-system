@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.VacinacaoDao">
+ 
+    <resultMap id="vacinacao" type="Vacinacao">
+        <id property="idVacinacao" column="id_vacinacao"/>
+        <result property="vacina.idVacina" column="id_vacina"/>
+        <result property="vacina.descricao" column="descricao"/>
+        <result property="nomeMarca" column="nome_marca"/>
+        <result property="dataVacinacao" column="Data_vacinacao"/>
+        <result property="dataProximaVacinacao" column="Data_proxima_vacinacao"/>
+        <result property="versao" column="versao"/>
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="Vacinacao" resultMap="vacinacao">
+        SELECT v.id_vacinacao,
+               v.id_vacina,
+               vv.descricao,
+               v.nome_marca,
+               v.data_vacinacao,
+               v.data_proxima_vacinacao
+          FROM vacinacao v, vacina vv
+          where upper(v.nome_Marca) like upper('%'||coalesce(#{nomeMarca},'')||'%') 
+           and coalesce(data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+           and v.id_vacina = vv.id_vacina
+            <if test="animal != null and animal.idAnimal != 0">
+                and v.id_animal = #{animal.idAnimal}
+            </if>
+          order by v.data_vacinacao desc , vv.descricao asc ,v.nome_Marca asc
+    </select>
+    
+    <update  id="update" parameterType="Vacinacao">
+        update vacinacao
+           set nome_marca = #{nomeMarca},
+               id_vacina = #{vacina.idVacina},
+               data_vacinacao = #{dataVacinacao},
+               data_proxima_vacinacao = #{dataProximaVacinacao}
+         where id_vacinacao = #{idVacinacao}  
+    </update>
+    <delete  id="delete" parameterType="Vacinacao">
+        delete 
+          from vacinacao
+         where id_vacinacao = #{idVacinacao}  
+    </delete>
+    <insert  id="insert" parameterType="Vacinacao">
+        insert into 
+         vacinacao (nome_marca,
+                id_animal,
+               id_vacina,
+               data_vacinacao,
+               data_proxima_vacinacao)
+        values (#{nomeMarca},
+               #{animal.idAnimal},
+               #{vacina.idVacina},
+               #{dataVacinacao},
+               #{dataProximaVacinacao})
+    </insert>
+    
+ 
+</mapper>

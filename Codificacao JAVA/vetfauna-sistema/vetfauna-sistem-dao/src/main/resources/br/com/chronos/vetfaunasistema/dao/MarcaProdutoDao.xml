@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="br.com.chronos.vetfaunasistema.dao.MarcaProdutoDao">
+ 
+    <resultMap id="marcaProduto" type="MarcaProduto">
+        <id property="idMarcaProduto" column="id_marca_Produto"/>
+        <result property="descricao" column="descricao"/>
+        <result property="categoriaProduto.idCategoriaProduto" column="id_Categoria_Produto"/>
+        <result property="categoriaProduto.descricao" column="descricao_categoria"/>
+        
+    </resultMap>
+    
+    <select id="selectLikeDescricao" parameterType="MarcaProduto" resultMap="marcaProduto">
+        SELECT mp.id_marca_Produto, 
+                mp.descricao,
+                mp.id_Categoria_Produto,
+                cp.descricao descricao_categoria
+          FROM marca_Produto mp, categoria_produto cp
+          where upper(mp.descricao) like upper('%'||coalesce(#{descricao},'')||'%') 
+           and coalesce(mp.data_exclusao,CURRENT_DATE+1) > CURRENT_DATE
+           and cp.id_Categoria_Produto = mp.id_Categoria_Produto
+           <if test="categoriaProduto != null and categoriaProduto.idCategoriaProduto != 0">
+                and #{categoriaProduto.idCategoriaProduto} = mp.id_categoria_produto
+           </if>
+          order by cp.descricao, mp.descricao 
+    </select>
+    
+    <update  id="update" parameterType="MarcaProduto">
+        update marca_Produto
+           set descricao = #{descricao}
+         where id_marca_Produto = #{idMarcaProduto}  
+    </update>
+    <delete  id="delete" parameterType="MarcaProduto">
+        delete 
+          from marca_Produto
+         where id_marca_Produto = #{idMarcaProduto}  
+    </delete>
+    <insert  id="insert" parameterType="MarcaProduto">
+        insert into 
+         marca_Produto (descricao,id_Categoria_Produto) 
+        values (#{descricao},#{categoriaProduto.idCategoriaProduto})  
+    </insert>
+    
+ 
+</mapper>

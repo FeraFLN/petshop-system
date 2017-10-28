@@ -1,0 +1,73 @@
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+ 
+<configuration>
+ 
+    <typeAliases>
+        <typeAlias alias="Cargo" type="br.com.chronos.vetfaunasistema.domain.Cargo"/>
+        <typeAlias alias="Funcionario" type="br.com.chronos.vetfaunasistema.domain.Funcionario"/>
+        <typeAlias alias="TipoTelefoneContato" type="br.com.chronos.vetfaunasistema.domain.TipoTelefoneContato"/>
+        <typeAlias alias="TelefoneContato" type="br.com.chronos.vetfaunasistema.domain.TelefoneContato"/>
+        <typeAlias alias="Fornecedor" type="br.com.chronos.vetfaunasistema.domain.Fornecedor"/>
+        <typeAlias alias="Vendedor" type="br.com.chronos.vetfaunasistema.domain.Vendedor"/>
+        <typeAlias alias="MarcaProduto" type="br.com.chronos.vetfaunasistema.domain.MarcaProduto"/>
+        <typeAlias alias="CategoriaProduto" type="br.com.chronos.vetfaunasistema.domain.CategoriaProduto"/>
+        <typeAlias alias="UnidadeMedida" type="br.com.chronos.vetfaunasistema.domain.UnidadeMedida"/>
+        <typeAlias alias="Produto" type="br.com.chronos.vetfaunasistema.domain.Produto"/>
+        <typeAlias alias="Estoque" type="br.com.chronos.vetfaunasistema.domain.Estoque"/>
+               
+        <typeAlias alias="Cliente" type="br.com.chronos.vetfaunasistema.domain.Cliente"/>
+        <typeAlias alias="Animal" type="br.com.chronos.vetfaunasistema.domain.Animal"/>
+        <typeAlias alias="Raca" type="br.com.chronos.vetfaunasistema.domain.Raca"/>
+        <typeAlias alias="Endereco" type="br.com.chronos.vetfaunasistema.domain.Endereco"/>
+        <typeAlias alias="Especie" type="br.com.chronos.vetfaunasistema.domain.Especie"/>
+        <typeAlias alias="PessoasAutorizadas" type="br.com.chronos.vetfaunasistema.domain.PessoasAutorizadas"/>
+        <typeAlias alias="TipoLogradouro" type="br.com.chronos.vetfaunasistema.domain.TipoLogradouro"/>
+         <typeAlias alias="Municipio" type="br.com.chronos.vetfaunasistema.domain.Municipio"/>
+        <typeAlias alias="Estado" type="br.com.chronos.vetfaunasistema.domain.Estado"/>
+        <typeAlias alias="Sexo" type="br.com.chronos.vetfaunasistema.utilitarios.enums.Sexo"/>
+        <typeAlias alias="Vacina" type="br.com.chronos.vetfaunasistema.domain.Vacina"/>
+        <typeAlias alias="Vacinacao" type="br.com.chronos.vetfaunasistema.domain.Vacinacao"/>
+        
+    </typeAliases>
+ 
+    
+   <environments default="development">
+        <environment id="development">
+          <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="org.postgresql.Driver"/>
+                <property name="url" value="jdbc:postgresql://localhost:5432/vetfaunasistemateste"/>
+                <property name="username" value="vetfaunasistema"/>
+                <property name="password" value="v3tf4un4"/>
+            </dataSource>
+       </environment>
+    </environments>
+    
+     <mappers>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/CargoDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/FuncionarioDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/TipoTelefoneContatoDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/TelefoneContatoDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/FornecedorDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/VendedorDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/MarcaProdutoDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/CategoriaProdutoDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/UnidadeMedidaDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/ProdutoDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/EstoqueDao.xml"/>
+       
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/ClienteDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/EstadoDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/TipoLogradouroDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/EnderecoDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/AnimalDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/EspecieDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/VacinaDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/VacinacaoDao.xml"/>
+       <mapper resource="br/com/chronos/vetfaunasistema/dao/PessoasAutorizadasDao.xml"/>
+    </mappers>
+     
+ 
+</configuration>
